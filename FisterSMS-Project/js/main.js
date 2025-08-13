@@ -1,40 +1,183 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
-    // CONFIGURATION & STATE MANAGEMENT
+    // CORE CONFIGURATION & STATE
     // =================================================================
-    const DB_KEY = 'fisterSMS_db_v14_final';
-    const USER_STATE_KEY = 'fisterSMS_user_v14_final';
-
-    const encryptData = (data) => btoa(JSON.stringify(data));
-    const decryptData = (encodedData) => {
-        try { return JSON.parse(atob(encodedData)); } catch (e) { return null; }
-    };
+    const DB_KEY = 'fisterSMS_db_v15_stable';
+    const USER_STATE_KEY = 'fisterSMS_user_v15_stable';
+    let db, userState;
 
     const getInitialDB = () => ({
         servers: [], services: [],
-        seo: { websiteTitle: 'FisterSMS', websiteDescription: 'OTP Verification Numbers' },
-        analytics: { todaysUsers: 0, totalUsers: 0, todaysOrders: 0, todaysPayment: 0 }
+        seo: { websiteTitle: 'FisterSMS', websiteDescription: 'OTP Verification' },
+        analytics: { totalUsers: 0, todaysOrders: 0, todaysPayment: 0 }
     });
 
     const getInitialUserState = () => ({
         balance: 100.00, lifetimeRecharge: 0.00, numbersPurchased: 0, activeOrders: []
     });
-
-    let db, userState;
-
+    
+    // =================================================================
+    // DATA MANAGEMENT
+    // =================================================================
     const saveData = (type) => {
         try {
-            if (type === 'db' || !type) localStorage.setItem(DB_KEY, encryptData(db));
-            if (type === 'user' || !type) localStorage.setItem(USER_STATE_KEY, encryptData(userState));
+            if (type === 'db' || !type) localStorage.setItem(DB_KEY, btoa(JSON.stringify(db)));
+            if (type === 'user' || !type) localStorage.setItem(USER_STATE_KEY, btoa(JSON.stringify(userState)));
         } catch (e) { console.error("Error saving data:", e); }
     };
 
     const loadData = () => {
-        db = decryptData(localStorage.getItem(DB_KEY)) || getInitialDB();
-        userState = decryptData(localStorage.getItem(USER_STATE_KEY)) || getInitialUserState();
-        if (!db.servers) db = getInitialDB(); // Ensure structure is valid
-        if (typeof userState.balance === 'undefined') userState = getInitialUserState();
+        try {
+            db = JSON.parse(atob(localStorage.getItem(DB_KEY) || ''));
+        } catch (e) { db = getInitialDB(); }
+
+        try {
+            userState = JSON.parse(atob(localStorage.getItem(USER_STATE_KEY) || ''));
+        } catch (e) { userState = getInitialUserState(); }
+        
+        if (!db || !db.servers) db = getInitialDB();
+        if (!userState || typeof userState.balance === 'undefined') userState = getInitialUserState();
+
+        saveData();
+    };
+
+    // =================================================================
+    // UI & VIEW MANAGEMENT
+    // =================================================================
+    const frontendView = document.getElementById('frontend-view');
+    const adminPanelView = document.getElementById('admin-panel');
+    
+    // We will define these after HTML is injected
+    let loginSection, appSection, loadingSpinner;
+
+    function showView(viewName) {
+        if (loginSection) loginSection.style.display = viewName === 'login' ? 'flex' : 'none';
+        if (appSection) appSection.style.display = viewName === 'app' ? 'block' : 'none';
+    }
+
+    // =================================================================
+    // EVENT HANDLING (Using Event Delegation)
+    // =================================================================
+    function setupGlobalEventListeners() {
+        document.body.addEventListener('click', function(event) {
+            const target = event.target;
+
+            // --- Login Button ---
+            if (target.classList.contains('form-btn')) {
+                event.preventDefault();
+                if (loadingSpinner) loadingSpinner.style.display = 'flex';
+                setTimeout(() => {
+                    if (loadingSpinner) loadingSpinner.style.display = 'none';
+                    showView('app');
+                    frontend.init();
+                }, 1000);
+            }
+
+            // --- Show/Hide Admin Panel ---
+            if (target.closest('#show-admin-panel-link')) {
+                event.preventDefault();
+                frontendView.classList.add('hidden');
+                adminPanelView.classList.remove('hidden');
+                adminPanel.init();
+            }
+            
+            if (target.closest('#back-to-frontend-btn')) {
+                event.preventDefault();
+                adminPanelView.classList.add('hidden');
+                frontendView.classList.remove('hidden');
+            }
+
+            // --- Login/Register Tab Toggle ---
+            if (target.id === 'login-toggle-btn' || target.id === 'register-toggle-btn') {
+                const isLogin = target.id === 'login-toggle-btn';
+                document.querySelector('#login-form').classList.toggle('active', isLogin);
+                document.querySelector('#register-form').classList.toggle('active', !isLogin);
+                document.querySelector('#login-toggle-btn').classList.toggle('active', isLogin);
+                document.querySelector('#register-toggle-btn').classList.toggle('active', !isLogin);
+            }
+
+            // --- Password Visibility Toggle ---
+            if (target.classList.contains('eye-icon')) {
+                const input = target.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                } else {
+                    input.type = 'password';
+                }
+            }
+        });
+    }
+    
+    // =================================================================
+    // MODULES
+    // =================================================================
+    const frontend = {
+        isInitialized: false,
+        init: function() {
+            if (this.isInitialized) return;
+            // Add any functions that need to run once the app view is shown
+            console.log("Frontend Initialized.");
+            this.isInitialized = true;
+        }
+    };
+
+    const adminPanel = {
+        isInitialized: false,
+        init: function() {
+            if (this.isInitialized) return;
+             // Add any functions that need to run once the admin panel is shown
+            console.log("Admin Panel Initialized.");
+            this.isInitialized = true;
+        }
+    };
+
+    // =================================================================
+    // APP BOOTSTRAP
+    // =================================================================
+    function initializeApp() {
+        // Step 1: Inject HTML from templates
+        const feTemplate = document.getElementById('frontend-template');
+        const adminTemplate = document.getElementById('admin-template');
+
+        if (feTemplate) {
+            frontendView.innerHTML = feTemplate.innerHTML;
+        } else {
+            frontendView.innerHTML = '<h1>Error: Frontend template missing.</h1>';
+            console.error('Frontend template not found!');
+        }
+
+        if (adminTemplate) {
+            adminPanelView.innerHTML = adminTemplate.innerHTML;
+        } else {
+            adminPanelView.innerHTML = '<h1>Error: Admin template missing.</h1>';
+            console.error('Admin template not found!');
+        }
+
+        // Step 2: Define references to the now-existing elements
+        loginSection = document.getElementById('login-section');
+        appSection = document.getElementById('app-section');
+        loadingSpinner = document.getElementById('loading-spinner');
+
+        if (!loginSection || !appSection || !loadingSpinner) {
+            console.error("Core app sections (#login-section, #app-section, #loading-spinner) are missing from your HTML templates!");
+            return;
+        }
+        
+        // Step 3: Load data
+        loadData();
+        
+        // Step 4: Set up event listeners that work everywhere
+        setupGlobalEventListeners();
+
+        // Step 5: Set the initial view
+        showView('login');
+    }
+
+    // Start the application
+    initializeApp();
+
+});        if (typeof userState.balance === 'undefined') userState = getInitialUserState();
         saveData(); // Save back to ensure consistency
     };
 
