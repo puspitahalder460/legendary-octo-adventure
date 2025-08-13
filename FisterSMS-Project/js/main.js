@@ -1,40 +1,168 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
-    // CONFIGURATION
+    // CONFIGURATION & STATE MANAGEMENT
     // =================================================================
-    const DB_KEY = 'fisterSMS_db_v13_config';
-    const USER_STATE_KEY = 'fisterSMS_user_v13_state';
+    const DB_KEY = 'fisterSMS_db_v14_final';
+    const USER_STATE_KEY = 'fisterSMS_user_v14_final';
 
-    // =================================================================
-    // DATA HANDLING & SECURITY
-    // =================================================================
     const encryptData = (data) => btoa(JSON.stringify(data));
     const decryptData = (encodedData) => {
-        try {
-            return JSON.parse(atob(encodedData));
-        } catch (e) {
-            console.error("Failed to parse or decrypt data:", e);
-            return null;
-        }
+        try { return JSON.parse(atob(encodedData)); } catch (e) { return null; }
     };
 
     const getInitialDB = () => ({
-        servers: [],
-        services: [],
-        seo: { websiteTitle: 'FisterSMS', websiteDescription: 'Buy phone numbers for OTP verification.'},
+        servers: [], services: [],
+        seo: { websiteTitle: 'FisterSMS', websiteDescription: 'OTP Verification Numbers' },
         analytics: { todaysUsers: 0, totalUsers: 0, todaysOrders: 0, todaysPayment: 0 }
     });
 
     const getInitialUserState = () => ({
-        balance: 100.00,
-        lifetimeRecharge: 0.00,
-        numbersPurchased: 0,
-        activeOrders: []
+        balance: 100.00, lifetimeRecharge: 0.00, numbersPurchased: 0, activeOrders: []
     });
 
     let db, userState;
 
+    const saveData = (type) => {
+        try {
+            if (type === 'db' || !type) localStorage.setItem(DB_KEY, encryptData(db));
+            if (type === 'user' || !type) localStorage.setItem(USER_STATE_KEY, encryptData(userState));
+        } catch (e) { console.error("Error saving data:", e); }
+    };
+
+    const loadData = () => {
+        db = decryptData(localStorage.getItem(DB_KEY)) || getInitialDB();
+        userState = decryptData(localStorage.getItem(USER_STATE_KEY)) || getInitialUserState();
+        if (!db.servers) db = getInitialDB(); // Ensure structure is valid
+        if (typeof userState.balance === 'undefined') userState = getInitialUserState();
+        saveData(); // Save back to ensure consistency
+    };
+
+    // =================================================================
+    // UTILITIES
+    // =================================================================
+    const showMessage = (msg, type = 'success') => { /* Your existing showMessage function */ };
+    const sanitizeHTML = (str) => { /* Your existing sanitizeHTML function */ };
+    window.addEventListener('error', (event) => { console.error('Global Error Caught:', event.message); });
+
+
+    // =================================================================
+    // VIEW & DOM MANAGEMENT
+    // =================================================================
+    const frontendView = document.getElementById('frontend-view');
+    const adminPanelView = document.getElementById('admin-panel');
+
+    // References to main sections, will be defined in initializeApp
+    let loginSection, appSection, loadingSpinner; 
+
+    function showView(viewName) {
+        loginSection.style.display = viewName === 'login' ? 'flex' : 'none';
+        appSection.style.display = viewName === 'app' ? 'block' : 'none';
+    }
+    
+    // =================================================================
+    // EVENT LISTENERS SETUP
+    // =================================================================
+    function setupEventListeners() {
+        // Use event delegation for dynamically added content
+        document.body.addEventListener('click', function(e) {
+            // --- Login Functionality ---
+            if (e.target.matches('.form-btn')) {
+                e.preventDefault();
+                loadingSpinner.style.display = 'flex';
+                setTimeout(() => {
+                    loadingSpinner.style.display = 'none';
+                    showView('app'); // Show the main app view
+                    frontend.init(); // Initialize main app functionalities
+                }, 1000); // Simulate login delay
+            }
+
+            if (e.target.closest('#show-admin-panel-link')) {
+                e.preventDefault();
+                frontendView.classList.add('hidden');
+                adminPanelView.classList.remove('hidden');
+                adminPanel.init();
+            }
+            
+            if (e.target.closest('#back-to-frontend-btn')) {
+                e.preventDefault();
+                adminPanelView.classList.add('hidden');
+                frontendView.classList.remove('hidden');
+            }
+
+            // Add other event listeners here (toggle forms, password visibility etc.)
+            if (e.target.matches('#login-toggle-btn, #register-toggle-btn')) {
+                 const isLogin = e.target.id === 'login-toggle-btn';
+                 document.querySelector('#login-form').classList.toggle('active', isLogin);
+                 document.querySelector('#register-form').classList.toggle('active', !isLogin);
+                 document.querySelector('#login-toggle-btn').classList.toggle('active', isLogin);
+                 document.querySelector('#register-toggle-btn').classList.toggle('active', !isLogin);
+            }
+
+        });
+    }
+
+    // =================================================================
+    // MODULES (Frontend & Admin)
+    // =================================================================
+    const frontend = {
+        isInitialized: false,
+        init: function() {
+            if (this.isInitialized || !appSection) return;
+            // Populate app section with content from templates if needed
+            this.updateDisplay();
+            this.isInitialized = true;
+        },
+        updateDisplay: function() {
+            // Your balance update logic etc.
+        }
+    };
+
+    const adminPanel = {
+        isInitialized: false,
+        init: function() {
+            if (this.isInitialized || !adminPanelView) return;
+            // Admin panel initializations (forms, buttons etc.)
+            this.isInitialized = true;
+        }
+    };
+
+    // =================================================================
+    // APP INITIALIZATION
+    // =================================================================
+    function initializeApp() {
+        // Inject templates into views if they are not already there
+        const feTemplate = document.getElementById('frontend-template');
+        if (frontendView.children.length === 0 && feTemplate) {
+             frontendView.innerHTML = feTemplate.innerHTML;
+        }
+        
+        const adminTemplateEl = document.getElementById('admin-template');
+        if (adminPanelView.children.length === 0 && adminTemplateEl) {
+             adminPanelView.innerHTML = adminTemplateEl.innerHTML;
+        }
+        
+        // Define main section variables
+        loginSection = document.getElementById('login-section');
+        appSection = document.getElementById('app-section');
+        loadingSpinner = document.getElementById('loading-spinner');
+
+        if (!loginSection || !appSection || !loadingSpinner) {
+            console.error('Core HTML sections are missing!');
+            document.body.innerHTML = "<h1>Error: App structure is broken.</h1>";
+            return;
+        }
+
+        loadData();
+        setupEventListeners();
+        
+        // Check login status here in a real app
+        // For now, default to login page
+        showView('login');
+    }
+
+    initializeApp();
+});
     const saveData = (type) => {
         try {
             if (type === 'db' || !type) {
