@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FisterSMS</title>
+    <meta name="description" content="Buy temporary numbers for OTP verification.">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Main container for the frontend application -->
+    <div id="frontend-view">
+        <!-- JS will populate this from the template -->
+    </div>
+
+    <!-- Hidden container for the admin panel -->
+    <div id="admin-panel" class="hidden">
+        <!-- JS will populate this from the template -->
+    </div>
+
+    <!-- Frontend HTML structure will be loaded from this template -->
+    <template id="frontend-template">
+        <div id="login-section">
+            <!-- Login/Register Form -->
+        </div>
+        <div id="app-section" style="display: none;">
+            <!-- Main App View -->
+        </div>
+        <div id="loading-spinner" style="display: none;">
+             <div class="spinner-content">Loading...</div>
+        </div>
+        <!-- All your original frontend body HTML goes inside the relevant sections here -->
+    </template>
+
+    <!-- Admin Panel HTML structure will be loaded from this template -->
+    <template id="admin-template">
+        <div class="page active" id="page-users">
+            <!-- Initial Admin Page -->
+        </div>
+        <div class="page" id="page-add-server">
+             <main>
+                <div class="page-header-back">
+                    <button class="back-btn" data-page="page-services"><img src="https://api.iconify.design/solar:arrow-left-linear.svg" alt="Back"></button>
+                    <h2>Add New Server</h2>
+                </div>
+                <div class="card">
+                    <form id="add-server-form">
+                        <div class="form-group">
+                            <label for="server-name">Server Name</label>
+                            <input type="text" id="server-name" name="serverName" placeholder="e.g., 5sim Demo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="server-country-code">Server Country Code</label>
+                            <input type="text" id="server-country-code" name="serverCountryCode" placeholder="e.g., ru" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="server-base-url">API Base URL</label>
+                            <input type="text" id="server-base-url" name="baseUrl" placeholder="e.g., https://5sim.net/v1/user" required>
+                            <p class="help-text">Enter the base URL for the API. Endpoints like /buy or /check will be appended to this.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="server-api-key">API Key</label>
+                            <input type="password" id="server-api-key" name="apiKey" placeholder="Your secret API key" required>
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <img src="https://api.iconify.design/solar:add-folder-bold.svg">
+                            Add Server
+                        </button>
+                    </form>
+                </div>
+            </main>
+        </div>
+        <!-- ... all other admin panel pages and elements ... -->
+        <a href="#" id="back-to-frontend-btn" style="position:fixed; bottom: 80px; right: 20px; background: #4b36cc; color: white; padding: 10px; border-radius: 50%; z-index: 101;">Back</a>
+    </template>
+    
+    <script src="js/main.js"></script>
+</body>
+</html>
+```**(নোট: আপনাকে `<template>`-এর ভেতরে আপনার সম্পূর্ণ HTML কোডটি বসাতে হবে। আমি শুধু মূল কাঠামোটি দেখিয়েছি।)**
+
+---
+
+### ধাপ ২: `css/style.css` ফাইল (চূড়ান্ত এবং ত্রুটিমুক্ত)
+
+`css/style.css` ফাইলটি খুলুন এবং এর ভেতরের সবকিছু মুছে দিয়ে আপনার সম্পূর্ণ CSS কোডটি পেস্ট করুন। এখানে কোনো পরিবর্তনের প্রয়োজন নেই।
+
+```css
+/* আপনার আগের ফাইলের সমস্ত CSS কোড এখানে পেস্ট করতে হবে */
+.hidden { display: none !important; }
+body { font-family: 'Roboto', sans-serif; margin: 0; }
+#frontend-view { background-color: #f8f9fa; }
+#frontend-view #login-section { background-color: #f6f5ff; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; transition: opacity 0.5s ease-out; }
+/* ... (এখানে আপনার সম্পূর্ণ CSS কোড থাকবে) ... */
+.wallet-notification.info { background: #3498db; }
+@keyframes ripple-animation { to { transform: scale(4); opacity: 0; } }
