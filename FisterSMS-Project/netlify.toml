@@ -1,0 +1,7 @@
+[build]
+  publish = "/" # আপনার প্রজেক্টের রুট ফোল্ডার (যেখানে index.html আছে)
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
