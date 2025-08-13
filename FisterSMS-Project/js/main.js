@@ -1,40 +1,112 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
-    // CORE CONFIGURATION & STATE
+    // Element References
     // =================================================================
-    const DB_KEY = 'fisterSMS_db_v15_stable';
-    const USER_STATE_KEY = 'fisterSMS_user_v15_stable';
-    let db, userState;
-
-    const getInitialDB = () => ({
-        servers: [], services: [],
-        seo: { websiteTitle: 'FisterSMS', websiteDescription: 'OTP Verification' },
-        analytics: { totalUsers: 0, todaysOrders: 0, todaysPayment: 0 }
-    });
-
-    const getInitialUserState = () => ({
-        balance: 100.00, lifetimeRecharge: 0.00, numbersPurchased: 0, activeOrders: []
-    });
+    // Since HTML is now static, we can define everything at the start.
+    const frontendView = document.getElementById('frontend-view');
+    const adminPanelView = document.getElementById('admin-panel');
     
-    // =================================================================
-    // DATA MANAGEMENT
-    // =================================================================
-    const saveData = (type) => {
-        try {
-            if (type === 'db' || !type) localStorage.setItem(DB_KEY, btoa(JSON.stringify(db)));
-            if (type === 'user' || !type) localStorage.setItem(USER_STATE_KEY, btoa(JSON.stringify(userState)));
-        } catch (e) { console.error("Error saving data:", e); }
-    };
+    const loginSection = document.getElementById('login-section');
+    const appSection = document.getElementById('app-section');
+    const loadingSpinner = document.getElementById('loading-spinner');
 
-    const loadData = () => {
-        try {
-            db = JSON.parse(atob(localStorage.getItem(DB_KEY) || ''));
-        } catch (e) { db = getInitialDB(); }
+    const loginBtn = document.querySelector('.form-btn');
+    const showAdminLink = document.getElementById('show-admin-panel-link');
+    const backToFrontendBtn = document.getElementById('back-to-frontend-btn');
 
-        try {
-            userState = JSON.parse(atob(localStorage.getItem(USER_STATE_KEY) || ''));
-        } catch (e) { userState = getInitialUserState(); }
+    const loginToggleBtn = document.getElementById('login-toggle-btn');
+    const registerToggleBtn = document.getElementById('register-toggle-btn');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const eyeIcons = document.querySelectorAll('.eye-icon');
+
+    // =================================================================
+    // View Management
+    // =================================================================
+    function showView(viewName) {
+        if (viewName === 'login') {
+            loginSection.style.display = 'flex';
+            appSection.style.display = 'none';
+        } else if (viewName === 'app') {
+            login-section.style.display = 'none';
+            appSection.style.display = 'block';
+        }
+    }
+
+    // =================================================================
+    // Event Listeners
+    // =================================================================
+
+    // --- Login Button ---
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            loadingSpinner.style.display = 'flex';
+
+            // Simulate a network request
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                // Switch views
+                loginSection.style.display = 'none';
+                appSection.style.display = 'block';
+            }, 1000);
+        });
+    } else {
+        console.error('Login button not found!');
+    }
+
+    // --- Admin Panel Links ---
+    if (showAdminLink) {
+        showAdminLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            frontendView.classList.add('hidden');
+            adminPanelView.classList.remove('hidden');
+        });
+    }
+
+    if (backToFrontendBtn) {
+        backToFrontendBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            adminPanelView.classList.add('hidden');
+            frontendView.classList.remove('hidden');
+        });
+    }
+
+    // --- Form Toggling ---
+    if (loginToggleBtn && registerToggleBtn) {
+        loginToggleBtn.addEventListener('click', () => {
+            loginForm.classList.add('active');
+            registerForm.classList.remove('active');
+            loginToggleBtn.classList.add('active');
+            registerToggleBtn.classList.remove('active');
+        });
+
+        registerToggleBtn.addEventListener('click', () => {
+            loginForm.classList.remove('active');
+            registerForm.classList.add('active');
+            loginToggleBtn.classList.remove('active');
+            registerToggleBtn.classList.add('active');
+        });
+    }
+    
+    // --- Password Visibility ---
+    eyeIcons.forEach(icon => {
+        icon.addEventListener('click', () => {
+            const input = icon.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        });
+    });
+
+    console.log("FisterSMS App Initialized Successfully.");
+
+});
+```4.  ফাইলটি **সেভ করুন**।        } catch (e) { userState = getInitialUserState(); }
         
         if (!db || !db.servers) db = getInitialDB();
         if (!userState || typeof userState.balance === 'undefined') userState = getInitialUserState();
