@@ -12,29 +12,66 @@
 
     <!-- Main container for the frontend application -->
     <div id="frontend-view">
-        <!-- JS will populate this from the template -->
+        <!-- The content below will be the initial state of your app -->
+        <div id="login-section">
+            <div class="login-container">
+                <div class="app-name">FisterSMS</div>
+                <div class="app-tagline">Welcome! Get your temporary number for any service.</div>
+                
+                <div class="form-toggle-buttons">
+                    <button id="login-toggle-btn" class="active">Login</button>
+                    <button id="register-toggle-btn">Sign Up</button>
+                </div>
+
+                <div id="login-form" class="login-form-section active">
+                    <form>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" placeholder="you@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" placeholder="Your password">
+                            <span class="eye-icon">👁️</span>
+                        </div>
+                        <button class="form-btn">Login</button>
+                    </form>
+                </div>
+
+                <div id="register-form" class="login-form-section">
+                     <!-- Your registration form HTML here -->
+                </div>
+
+                <p class="form-link-text">Don't have an account? <a href="#" id="show-register-form">Sign Up</a></p>
+            </div>
+        </div>
+
+        <div id="app-section" style="display: none;">
+            <!-- This will be populated by JS after login -->
+            <!-- Example: Admin Panel Link -->
+            <div style="text-align: center; padding: 20px;">
+                <a href="#" id="show-admin-panel-link" style="color: #888; text-decoration: none;">Admin Panel</a>
+            </div>
+        </div>
     </div>
 
     <!-- Hidden container for the admin panel -->
     <div id="admin-panel" class="hidden">
-        <!-- JS will populate this from the template -->
+        <!-- Admin panel content will be loaded by JS -->
     </div>
 
-    <!-- Frontend HTML structure will be loaded from this template -->
+    <!-- All Templates remain here -->
     <template id="frontend-template">
-        <div id="login-section">
-            <!-- Login/Register Form -->
-        </div>
-        <div id="app-section" style="display: none;">
-            <!-- Main App View -->
-        </div>
-        <div id="loading-spinner" style="display: none;">
-             <div class="spinner-content">Loading...</div>
-        </div>
-        <!-- All your original frontend body HTML goes inside the relevant sections here -->
+        <!-- Your full frontend template HTML from original file -->
     </template>
-
-    <!-- Admin Panel HTML structure will be loaded from this template -->
+    <template id="admin-template">
+        <!-- Your full admin panel template HTML from original file -->
+    </template>
+    
+    <!-- JavaScript file is linked at the end -->
+    <script src="js/main.js"></script>
+</body>
+</html>    <!-- Admin Panel HTML structure will be loaded from this template -->
     <template id="admin-template">
         <div class="page active" id="page-users">
             <!-- Initial Admin Page -->
